@@ -1,0 +1,10 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "scrape_gpt"
+version = "0.1.0"
+description = "A LLM powered webscraper"
+authors = [{name = "P1ayr-1"}]
+
+dependencies = ["requests"]

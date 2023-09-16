@@ -1,0 +1,2 @@
+selectolax @ git+https://github.com/P1ayer-1/selectolax.git@master#egg=selectolax
+tldextract==3.5.0

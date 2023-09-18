@@ -3,7 +3,6 @@ from scrape_gpt.parser import SelectolaxParser
 from typing import List, Dict, Tuple, Union, Optional
 from transformers import BertTokenizerFast, BertModel
 import torch
-from scrape_gpt.types import DeviceMap
 
 
 class LlmScraper():

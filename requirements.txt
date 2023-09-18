@@ -1,3 +1,4 @@
 selectolax @ git+https://github.com/P1ayer-1/selectolax.git
 tldextract==3.5.0
 pyyaml==6.0.1
+transformers[torch]>=4.3.0,<=4.33.2

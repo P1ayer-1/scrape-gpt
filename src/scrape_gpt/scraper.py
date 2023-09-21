@@ -61,6 +61,6 @@ class LlmScraper():
 
     def get_parser(self, parser: str = "selectolax"):
         if parser == "selectolax":
-            return SelectolaxParser(self.url)
+            return SelectolaxParser(self.html)
         else:
             raise NotImplementedError(f"Parser {parser} not implemented yet.")

@@ -57,7 +57,56 @@ class LlmScraper():
             self.model = BertModel.from_pretrained(model_name, cache_dir=hf_cache_dir, device_map=device_map)
         self.device = self.model.device
         
+    def _retrieval_format(self, instruction: str, texts: List[str]) -> List[str]:
+        return [f"{instruction} {text}" for text in texts]
     
+    def text_retrieval(self,
+                        queries: List[str], 
+                        corpus: List[str], 
+                        top_k: Optional[int]=None,
+                        query_instruction: str="retrieve similar", 
+    
+                        only_cosine: bool=False) -> List[List[Tuple[str, float]]]:
+        formatted_queries = self._retrieval_format(query_instruction, queries)
+
+        tok_inputs = self.tokenizer(formatted_queries + corpus, padding=True, truncation=True, return_tensors="pt")
+        with torch.no_grad():
+            all_vecs = self.model(**tok_inputs.to(self.device))
+
+
+        sentence_embeddings = all_vecs[0][:, 0]
+        sentence_embeddings = torch.nn.functional.normalize(sentence_embeddings, p=2, dim=-1)
+
+        query_vecs = sentence_embeddings[:len(formatted_queries)]
+        corpus_vecs = sentence_embeddings[len(formatted_queries):]
+
+        cosine_scores = query_vecs @ corpus_vecs.T
+
+
+
+        if top_k is not None:
+            cosine_scores = cosine_scores.topk(top_k, dim=-1)
+
+        if only_cosine:
+            return cosine_scores
+        
+
+        final_results = []
+        for i, query in enumerate(queries):
+            if top_k is None:
+                results = list(zip(corpus, cosine_scores[i]))
+            else:
+                results = []
+                for j, idx in enumerate(cosine_scores.indices[i]):
+                    results.append((corpus[idx], cosine_scores.values[i][j]))
+
+
+            final_results.append((query, results))
+
+
+        return final_results
+
+
 
     def get_parser(self, parser: str = "selectolax"):
         if parser == "selectolax":
